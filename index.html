@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>smo</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<div class="container">
+    <div class="title__wrap">
+        <h1>Система массового обслуживания</h1>
+    </div>
+    <div class="row">
+        <div class="form-group col-sm-4">
+            <label for="usr">m</label>
+            <input type="text" class="form-control" id="m">
+        </div>
+        <div class="form-group col-sm-4">
+            <label for="usr">y</label>
+            <input type="text" class="form-control" id="y">
+        </div>
+        <div class="form-group col-sm-4">
+            <label for="usr">x</label>
+            <input type="text" class="form-control" id="x">
+        </div>
+        <div class="form-group col-sm-12">
+            <div class="checkbox__wrap">
+                <input type="checkbox" id="cbx" style="display: none;">
+                <label for="cbx" class="check">
+                    <svg width="18px" height="18px" viewBox="0 0 18 18">
+                        <path d="M1,9 L1,3.5 C1,2 2,1 3.5,1 L14.5,1 C16,1 17,2 17,3.5 L17,14.5 C17,16 16,17 14.5,17 L3.5,17 C2,17 1,16 1,14.5 L1,9 Z"></path>
+                        <polyline points="1 9 7 14 15 4"></polyline>
+                    </svg>
+                </label>
+                <span class="check__span">Без отказов</span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-sm-4">
+            <label for="usr">p</label>
+            <input type="text" readonly class="form-control" id="p">
+        </div>
+        <div class="form-group col-sm-4">
+            <label for="usr">p0</label>
+            <input type="text" readonly class="form-control" id="p0">
+        </div>
+        <div class="form-group col-sm-4">
+            <div id="wrap-pot">
+                <label for="usr">P oтказа</label>
+                <input type="text" readonly class="form-control" id="pot">
+            </div>
+        </div>
+        <div class="form-group col-sm-4">
+            <label for="usr">y1</label>
+            <input type="text" readonly class="form-control" id="y1">
+        </div>
+        <div class="form-group col-sm-4">
+            <label for="usr">y2</label>
+            <input type="text" readonly class="form-control" id="y2">
+        </div>
+        <div class="form-group col-sm-4">
+            <label for="usr">y3</label>
+            <input type="text" readonly class="form-control" id="y3">
+        </div>
+        <div class="form-group col-sm-4">
+            <label for="usr">y4</label>
+            <input type="text" readonly class="form-control" id="y4">
+        </div>
+        <div class="form-group col-sm-4">
+            <label for="usr">k</label>
+            <input type="text" readonly class="form-control" id="k">
+        </div>
+        <div class="form-group col-sm-12">
+            <button class="btn" type="submit" onclick="Call()"><span>Рассчитать</span></button>
+        </div>
+    </div>
+</div>
+<script>
+    require('./render.js');
+
+    function GetFact(r) {
+        let res = 1;
+        for (let i = 1; i <= r; i++) res *= i;
+        return res;
+    }
+
+    function Call() {
+        let m = document.getElementById('m').value;
+        let y = document.getElementById('y').value;
+        let p = y / m;
+        let x = document.getElementById('x').value;
+        let check = document.getElementById('cbx');
+        let P0 = 0;
+        let E = 0;
+        for (let i = 0; i <= x; i++) {
+            let f = GetFact(i);
+            E += (Math.pow(p, i) / GetFact(i));
+        }
+        if (check.checked) {
+            E += Math.pow(p, x + 1) / (GetFact(x) * (x - p));
+            document.getElementById('wrap-pot').style.opacity = '0';
+        } else {
+            document.getElementById('wrap-pot').style.opacity = '1';
+        }
+        P0 = 1 / E;
+        for (let i = 0; i <= x; i++) {
+            let f = GetFact(i);
+            E += (Math.pow(p, i) / GetFact(i));
+        }
+        let y1 = (Math.pow(p, x + 1) * P0) / (GetFact(x - 1) * (x - p) * (x - p));
+        document.getElementById('p').value = p;
+        document.getElementById('p0').value = P0;
+        document.getElementById('pot').value = (Math.pow(p, x) / GetFact(x) * P0);
+        document.getElementById('y1').value = y1;
+        document.getElementById('y2').value = y1 + p;
+        document.getElementById('y3').value = y1 / y;
+        document.getElementById('y4').value = document.getElementById('y2').value / y;
+        let k = p / x;
+        document.getElementById('k').value = k;
+        if (document.getElementById("m").value === '') {
+            alert("Введите скорость обслуживания");
+        }
+        if (document.getElementById("y").value === '') {
+            alert("Введите скорость входного потока");
+        }
+        if (document.getElementById("x").value === '') {
+            alert("Введите количество обслуживающих каналов");
+        }
+    }
+</script>
+
+</body>
+</html>
